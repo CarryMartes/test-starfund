@@ -1,0 +1,15 @@
+@import 'variables';
+
+.wrapper {
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 20px;
+  &_products {
+    display: flex;
+    flex-shrink: 1;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 30px;
+  }
+}

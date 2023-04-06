@@ -1,0 +1,13 @@
+@import "variables";
+
+.searchbar {
+  & > input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid map-get($colors, dark_blue);
+    outline: none;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+}

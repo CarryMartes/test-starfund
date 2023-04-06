@@ -1,0 +1,12 @@
+@import "variables";
+
+
+.sort {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+
+  & > select {
+    margin-left: 20px;
+  }
+}
