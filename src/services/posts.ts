@@ -16,7 +16,16 @@ export const enum SORT_ORIENTATION {
 
 class Posts {
     getProducts( config?: AxiosRequestConfig): Promise<IProductsResponse[]> {
-        return axiosClient.get(SLUGS.products, config);
+        return axiosClient.get<IProductsResponse[]>(SLUGS.products, config).then(res => {
+            // setting from disabled from localstorage
+            const response = res.data;
+            return response.map(res => {
+                return {
+                    ...res,
+                    data: res.data.map(product => ({...product, disabled: ProductStorage.getValueById(product)}))
+                }
+            });
+        });
     }
 
     static filterByTitle(value: string, response: IProductsResponse[]) {
@@ -54,9 +63,23 @@ class ProductStorage {
         const currentItem = localStorage.get(STORAGE_KEY);
         if (currentItem) {
             const parsedItem: any = JSON.parse(currentItem) as any;
-            localStorage.set(STORAGE_KEY, JSON.stringify({ ...parsedItem, [product.id]: value}));
+            localStorage.set(
+                STORAGE_KEY,
+                JSON.stringify({
+                    ...parsedItem,
+                    [product.id]: {
+                        value,
+                        price: product.price
+                    }
+                }
+            ));
         } else {
-            localStorage.set(STORAGE_KEY, JSON.stringify({[product.id]: value}))
+            localStorage.set(STORAGE_KEY, JSON.stringify({
+                [product.id]: {
+                    value,
+                    price: product.price
+                }
+            }))
         }
     }
 
@@ -66,7 +89,26 @@ class ProductStorage {
             return false;
         }
 
-        return (JSON.parse(currentItem) as any)[product.id];
+        return (JSON.parse(currentItem) as any)[product.id]?.value;
+    }
+
+    static getAll(): {count: number, price: number} {
+        const currentItems = localStorage.get(STORAGE_KEY);
+        if (!currentItems) {
+            return {count: 0, price: 0};
+        }
+        const idWithValue = JSON.parse(currentItems);
+        let newObj: Record<any, any> = {};
+        let price: number = 0;
+        for (let key of Object.keys(idWithValue)) {
+            if (idWithValue[key].value) {
+                newObj[key] = idWithValue[key];
+                price += idWithValue[key].price;
+            }
+        }
+        const count = Object.keys(newObj).length;
+
+        return {count, price};
     }
 }
 

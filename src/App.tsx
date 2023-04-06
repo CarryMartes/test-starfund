@@ -7,6 +7,7 @@ import {useDebounce} from "./hooks/use-debounce";
 import {Posts, postsApi, ProductStorage, SORT_ORIENTATION} from "./services";
 import FiltersBar from "./ui/FiltersBar";
 import {IProduct, IProductCard, IProductsResponse} from "./model";
+import BasketInfo from "./ui/BasketInfo";
 
 function App() {
     const [products, setProducts] = useState([]);
@@ -18,11 +19,8 @@ function App() {
             const {data, page, hasNext} = response[params.page - 1];
             setProducts([...products, ...data]);
             setParams({page: page + 1, hasNext});
-
-            setIsFetching(false);
-        } else {
-            setIsFetching(false);
         }
+        setIsFetching(false);
     }, [response, params]);
 
     const [_, setIsFetching] = useInfiniteScroll(fetchProducts);
@@ -33,10 +31,7 @@ function App() {
     useEffect(() => {
         postsApi.getProducts().then(res => {
             const {data, page, hasNext} = res[params.page - 1];
-            setProducts([
-                ...products,
-                ...data.map(res => ({...res, disabled: ProductStorage.getValueById(res)}))
-            ]);
+            setProducts(data);
             setParams({page: page + 1, hasNext});
 
             setIsFetching(false);
@@ -66,6 +61,7 @@ function App() {
         <div className="wrapper">
             <SearchBar onChange={(value) => setSearchValue(value)} />
             <FiltersBar onCallback={onSortApply} />
+            <BasketInfo products={products} />
             <div className="wrapper_products">
                 {
                     products && products.map((res, key) => (

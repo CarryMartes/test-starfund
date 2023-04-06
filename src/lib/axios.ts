@@ -14,10 +14,4 @@ axiosClient.defaults.timeout = 2000;
 
 axiosClient.defaults.withCredentials = true;
 
-axiosClient.interceptors.response.use(function (response) {
-    return response.data;
-}, function (error) {
-    return error;
-});
-
 export default axiosClient;
